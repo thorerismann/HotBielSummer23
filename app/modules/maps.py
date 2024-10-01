@@ -1,11 +1,10 @@
 import geopandas as gpd
 import pandas as pd
-from folium import folium, GeoJson, GeoJsonTooltip
+from folium import folium, Tooltip, CircleMarker, GeoJson
 import streamlit_folium
 import streamlit as st
 from pathlib import Path
 from pyproj import Transformer
-import rasterio
 from folium.raster_layers import ImageOverlay
 
 class MapDisplay:
@@ -26,11 +25,16 @@ class MapDisplay:
     @staticmethod
     def load_base_map(points, zoom_start = 15,location = [47.140093, 7.272311], height=700, width=800):
         m = folium.Map(location=location, zoom_start=zoom_start, height=height, width=width)
-        GeoJson(
-            points,
-            style_function=lambda x: {'color': 'darkred'},  # This line sets the color
-            tooltip=GeoJsonTooltip(fields=['Sensor', 'Name'])
-        ).add_to(m)
+        for _, row in points.iterrows():  # Assuming points is a Pandas DataFrame or GeoDataFrame
+            CircleMarker(
+                location=[row['geometry'].y, row['geometry'].x],  # Latitude, Longitude from 'geometry'
+                radius=15,  # Set marker size
+                color='darkblue',
+                fill=True,
+                fill_opacity=0.7,
+                tooltip=Tooltip(f"Sensor: {row['Sensor']}, Name: {row['Name']}")  # Add a tooltip for hover
+            ).add_to(m)
+
         return m
 
     @staticmethod
