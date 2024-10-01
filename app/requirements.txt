@@ -1,4 +1,3 @@
-altair @ file:///home/conda/feedstock_root/build_artifacts/altair-split_1724753941878/work
 arviz @ file:///home/conda/feedstock_root/build_artifacts/arviz_1727611688193/work
 asttokens @ file:///home/conda/feedstock_root/build_artifacts/asttokens_1698341106958/work
 attrs @ file:///home/conda/feedstock_root/build_artifacts/attrs_1722977137225/work
