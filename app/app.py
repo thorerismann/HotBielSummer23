@@ -9,6 +9,7 @@ st.set_page_config(layout="wide")
 
 def main():
     st.title('Welcome to Biel Heatmaps')
+    st.write('hey there')
     activities = ['Home', 'Maps', 'Data Viz', 'Station Explorer', 'BAMBI Model']
     choice = st.sidebar.selectbox('Select Activity', activities)
 
