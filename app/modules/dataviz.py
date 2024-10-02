@@ -6,8 +6,8 @@ from pathlib import Path
 import xarray as xr
 import streamlit as st
 
-meteo_path = Path.cwd() / 'appdata' /'meteo_daily.nc'
-station_path = Path.cwd() / 'appdata' /'stationdata.nc'
+meteo_path = Path(__file__).parent.parent / 'appdata' /'meteo_daily.nc'
+station_path = Path(__file__).parent.parent / 'appdata' /'stationdata.nc'
 
 station_dict = {'rural': [206, 207],
                 'care_homes': [220, 222, 223, 235, 227],

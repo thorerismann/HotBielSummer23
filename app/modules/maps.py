@@ -12,7 +12,7 @@ class MapDisplay:
     @staticmethod
     @st.cache_data
     def load_points():
-        points_path = Path(__file__).parent / 'appdata' / 'sensors_locations.csv'
+        points_path = Path(__file__).parent.parent / 'appdata' / 'sensors_locations.csv'
         points = pd.read_csv(points_path)
         points = points.dropna(subset='Name').sort_values(by='Name')
         points_gpd = gpd.GeoDataFrame(points, geometry=gpd.points_from_xy(points.X, points.Y))
