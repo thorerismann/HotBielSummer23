@@ -5,10 +5,18 @@ import streamlit_folium as stf
 
 from modules import about, maps, dataviz
 
-st.set_page_config(layout="wide")
+base_path = Path(__file__).parent
+data_path = base_path / 'appdata'
+favicon = base_path / 'favicon.ico'
+
+st.set_page_config(
+    page_title='Hot Biel Summer',
+    page_icon=str(favicon),
+    layout='centered',
+    initial_sidebar_state='auto'
+)
 
 def main():
-    st.title('Welcome to Biel Heatmaps')
     st.write('hey there')
     activities = ['Home', 'Maps', 'Data Viz', 'Station Explorer', 'BAMBI Model']
     choice = st.sidebar.selectbox('Select Activity', activities)
