@@ -86,16 +86,16 @@ class MapDisplay:
 
 base = Path.cwd() / 'appdata' / 'images'
 image_paths = {
-    'Fitnahtemp': base / 'fitnahtemp.png',
-    'Fitnahuhispace': base / 'uhispace.png',
-    'Fitnahuhistreet': base / 'uhistreet.png',
-    'Elevation Contours': base / 'elevation_contours.png',
-    'Slope': base / 'slope.png'
+    'Fitnahtemp': Path(__file__).parent.parent / 'appdata' / 'fitnahtemp.png',
+    'Fitnahuhispace': Path(__file__).parent.parent / 'appdata' /'uhispace.png',
+    'Fitnahuhistreet': Path(__file__).parent.parent / 'appdata' / 'uhistreet.png',
+    'Elevation Contours': Path(__file__).parent.parent / 'appdata' / 'elevation_contours.png',
+    'Slope': Path(__file__).parent.parent / 'appdata' / 'slope.png'
 }
 legend_paths = {
-    'Fitnahtemp': base / 'fitnahtemp_legend.png',
-    'Fitnahuhispace': base / 'uhi_space_legend.png',
-    'Fitnahuhistreet': base / 'uhis_treet_legend.png'
+    'Fitnahtemp': Path(__file__).parent.parent / 'appdata' / 'fitnahtemp_legend.png',
+    'Fitnahuhispace': Path(__file__).parent.parent / 'appdata' /'uhi_space_legend.png',
+    'Fitnahuhistreet': Path(__file__).parent.parent / 'appdata' /'uhis_treet_legend.png'
 }
 def select_overlay():
     with st.form('Choose Overlay'):
