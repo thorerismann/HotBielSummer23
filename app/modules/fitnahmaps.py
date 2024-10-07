@@ -23,12 +23,12 @@ class MapDisplay:
         return points_degrees
 
     @staticmethod
-    def load_base_map(points, zoom_start = 15,location = [47.140093, 7.272311], height=700, width=800):
+    def load_base_map(points, zoom_start = 13,location = [47.11093, 7.362311], height=700, width=800):
         m = folium.Map(location=location, zoom_start=zoom_start, height=height, width=width)
         for _, row in points.iterrows():  # Assuming points is a Pandas DataFrame or GeoDataFrame
             CircleMarker(
                 location=[row['geometry'].y, row['geometry'].x],  # Latitude, Longitude from 'geometry'
-                radius=15,  # Set marker size
+                radius=5,  # Set marker size
                 color='darkblue',
                 fill=True,
                 fill_opacity=0.7,
@@ -36,20 +36,6 @@ class MapDisplay:
             ).add_to(m)
 
         return m
-
-    @staticmethod
-    def load_buffers(self, buffers, points=False):
-        for buffer in buffers:
-            loaded_buffer = gpd.read_file(f'/home/tge/masterthesis/app/database/mapstuff/buffer_{buffer}.geojson')
-            loaded_buffer['buffer'] = buffer
-            if points:
-                loaded_buffer = loaded_buffer[loaded_buffer['Name'].isin(points)]
-            GeoJson(loaded_buffer, tooltip = GeoJsonTooltip(fields=['buffer'])).add_to(self.base_map)
-
-    @staticmethod
-    def plot_elevation_contour(self):
-        GeoJson(self.elevation_contour).add_to(self.base_map)
-        return self.base_map
 
     @staticmethod
     def overlay_image(base_map):
@@ -86,16 +72,16 @@ class MapDisplay:
 
 base = Path.cwd() / 'appdata' / 'images'
 image_paths = {
-    'Fitnahtemp': Path(__file__).parent.parent / 'appdata' / 'fitnahtemp.png',
-    'Fitnahuhispace': Path(__file__).parent.parent / 'appdata' /'uhispace.png',
-    'Fitnahuhistreet': Path(__file__).parent.parent / 'appdata' / 'uhistreet.png',
-    'Elevation Contours': Path(__file__).parent.parent / 'appdata' / 'elevation_contours.png',
-    'Slope': Path(__file__).parent.parent / 'appdata' / 'slope.png'
+    'Fitnahtemp': Path(__file__).parent.parent / 'appdata' / 'images' / 'fitnahtemp.png',
+    'Fitnahuhispace': Path(__file__).parent.parent / 'appdata' / 'images' /'uhispace.png',
+    'Fitnahuhistreet': Path(__file__).parent.parent / 'appdata' / 'images' / 'uhistreet.png',
+    'Elevation Contours': Path(__file__).parent.parent / 'appdata' / 'images' / 'elevation_contours.png',
+    'Slope': Path(__file__).parent.parent / 'appdata' / 'images' / 'slope.png'
 }
 legend_paths = {
-    'Fitnahtemp': Path(__file__).parent.parent / 'appdata' / 'fitnahtemp_legend.png',
-    'Fitnahuhispace': Path(__file__).parent.parent / 'appdata' /'uhi_space_legend.png',
-    'Fitnahuhistreet': Path(__file__).parent.parent / 'appdata' /'uhis_treet_legend.png'
+    'Fitnahtemp': Path(__file__).parent.parent / 'appdata' / 'images' / 'fitnahtemp_legend.png',
+    'Fitnahuhispace': Path(__file__).parent.parent / 'appdata' / 'images' /'uhi_space_legend.png',
+    'Fitnahuhistreet': Path(__file__).parent.parent / 'appdata' / 'images' /'uhis_treet_legend.png'
 }
 def select_overlay():
     with st.form('Choose Overlay'):

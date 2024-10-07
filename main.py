@@ -5,6 +5,7 @@ import numpy as np
 from plots import boxplots, meteoplots, biasplots, uhiplots, sdtnplots
 import geopandas as gpd
 import pandas as pd
+from shapely.geometry import Point
 
 sensor_labels = {
     206: 'rural reference',
@@ -175,29 +176,31 @@ def prepare_app_data():
     c = m23.sel(time=slice(periods['summer23'][0], periods['summer23'][1])).temperature.resample(time='1d').min()
     d = m23.sel(time=slice(periods['summer23'][0], periods['summer23'][1])).windspeed.resample(time='1d').mean()
     e = m23.sel(time=slice(periods['summer23'][0], periods['summer23'][1])).precipitation.resample(time='1d').sum()
-    a.name = 'mean_temp'
-    b.name = 'max_temp'
-    c.name = 'min_temp'
-    d.name = 'mean_wind'
-    e.name = 'sum_precip'
+    a.name = 'meteo_mean'
+    b.name = 'meteo_max'
+    c.name = 'meteo_min'
+    d.name = 'wind'
+    e.name = 'precip'
     tempds = xr.merge([a, b, c, d, e])
-    tempds.to_netcdf(app_location / 'meteo_daily.nc')
+    meteods = tempds.sel(stn='GRE').drop_vars('stn')
 
-    # daily early morning UHI / city index values
+
+    # prepare station results dataset
+
     uhi_resampled = uhi23.sel(time=slice(periods['summer23'][0], periods['summer23'][1])).resample(time='1h').mean()
     uhi_4 = uhi_resampled.sel(time=uhi_resampled.time.dt.hour == 4)
     uhi_4.coords['time'] = pd.to_datetime(uhi_4.time.values).floor('D')
-    # daily minmum uhi / city index values
+
     maximum = uhi23.sel(time=slice(periods['summer23'][0], periods['summer23'][1])).resample(time='1d').max()
 
-    # tropical nights
-    tn = tn.sel(time=slice(periods['summer23'][0], periods['summer23'][1]), threshold=20)
+    tn = tn.sel(time=slice(periods['summer23'][0], periods['summer23'][1]), threshold=20).drop_vars('threshold')
+    sd = sd.sel(time=slice(periods['summer23'][0], periods['summer23'][1]), threshold=31).drop_vars('threshold')
 
-    # daily minimum and maximum temperatures
     maxtemp = d23.resample(time = '1d').max()
     mintemp = d23.resample(time = '1d').min()
 
     ds = xr.Dataset({'tropical_nights': tn.tropical_nights,
+                     'summer_days': sd.summer_days,
                      'max_temp': maxtemp,
                     'min_temp': mintemp,
                      'uhi_4': uhi_4.uhi_206,
@@ -205,24 +208,58 @@ def prepare_app_data():
                      'uhi_max': maximum.uhi_206,
                      'ci_max': maximum.city_index,
                      })
-    import matplotlib.pyplot as plt
-    ds.sel(sensor=201).uhi_max.plot()
-    plt.show()
     ds = ds.drop_duplicates('time')
     ds = ds.drop_duplicates('sensor')
-    ds.to_netcdf(app_location / 'stationdata.nc')
-    ds.sel(sensor=201).uhi_max.plot()
-    plt.show()
-    gdata_sel = gdata[gdata.buffer.isin([10,100,500])]
-    ludata_sel = ludata[ludata.buffer.isin([10,100,500])]
-    gdata_sel.to_csv(app_location / 'geodata.csv', index=False)
-    ludata_sel.to_csv(app_location / 'landuse.csv', index=False)
 
-    # sensors to geojson
-    sensors = gpd.GeoDataFrame(sensors, geometry=gpd.points_from_xy(sensors.X, sensors.Y))
-    sensors = sensors.set_crs('epsg:2056')  # Ensure CRS is set correctly
-    sensors.to_file(app_location / 'sensors.geojson', driver='GeoJSON')
+    # prepare locations
 
+    gdf = gpd.GeoDataFrame(
+        sensors,
+        geometry=[Point(xy) for xy in zip(sensors.X, sensors.Y)],
+        crs='epsg:2056'
+    ).to_crs('epsg:4326')
+
+    gdf['X'] = gdf.geometry.apply(lambda p: p.x)
+    gdf['Y'] = gdf.geometry.apply(lambda p: p.y)
+    locs = pd.DataFrame({
+        'X': gdf.X,
+        'Y': gdf.Y,
+        'sensor': gdf.sensor,
+        'name': gdf.Long_name
+    })
+
+    # add locations to dataset
+    ds.coords['X'] = ('sensor', locs['X'])
+    ds.coords['Y'] = ('sensor', locs['Y'])
+    ds.coords['name'] = ('sensor', locs['name'])
+
+    # add meteo dataset
+    merged = xr.merge([ds, meteods])
+
+    # prepare geodata
+    gdata_sel = gdata[gdata.buffer.isin([10,50,100,500])]
+    ludata_sel = ludata[ludata.buffer.isin([10,50,100,500])]
+
+    pivoted_data = gdata_sel.pivot_table(index=['buffer', 'sensor'], columns='dtype', values='mean')
+    pds = pivoted_data.to_xarray()
+    ls = ludata_sel.set_index(['buffer', 'sensor']).drop(['geometry', 'X', 'Y', 'Long_name'], axis=1).to_xarray()
+    description_dict = {
+        20: "Buildings",
+        22: "Paved",
+        14: "Water",
+        7: "Rails",
+        9: "Grass",
+        15: "Vines",
+        24: "Developed",
+        25: "Forest",
+        16: "Rock",
+        27: "Barren"
+    }
+    ddict = {str(k): v for k, v in description_dict.items()}
+    ls_rn = ls.rename(ddict)
+    combined_geo = xr.merge([pds, ls_rn], join='exact')
+    merged = xr.merge([merged, combined_geo])
+    merged.to_netcdf(app_location / 'app_data.nc')
 
 
 
