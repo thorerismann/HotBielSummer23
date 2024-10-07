@@ -1,7 +1,6 @@
 import geopandas as gpd
 import pandas as pd
 from folium import folium, Tooltip, CircleMarker, GeoJson
-import streamlit_folium
 import streamlit as st
 from pathlib import Path
 from pyproj import Transformer

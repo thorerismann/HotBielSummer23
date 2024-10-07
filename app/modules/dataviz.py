@@ -1,11 +1,9 @@
 import holoviews as hv
-import pandas as pd
 import hvplot.pandas
 import hvplot.xarray
 from pathlib import Path
 import xarray as xr
 import streamlit as st
-import matplotlib.pyplot as plt
 
 meteo_path = Path(__file__).parent.parent / 'appdata' /'meteo_daily.nc'
 station_path = Path(__file__).parent.parent / 'appdata' /'stationdata.nc'
