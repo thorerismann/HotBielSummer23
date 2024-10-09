@@ -1,22 +1,16 @@
 from pathlib import Path
 
 import streamlit as st
-import streamlit_folium as stf
 import xarray as xr
 
 from modules import about, fitnahmaps, dataviz, stationmap
 
+
+# Set Paths
 base_path = Path(__file__).parent
 data_path = base_path / 'appdata'
 image_path = data_path / 'images'
 favicon = base_path / 'favicon.ico'
-
-@st.cache_data()
-def load_data(basepath=data_path / 'app_data.nc'):
-    with xr.open_dataset(basepath) as ds:
-        loaded = ds.load()
-    return ds
-
 
 maps_paths = {
     'elevation': image_path / 'elevation_contours.png',
@@ -32,6 +26,16 @@ legends_paths = {
     'fitnahtemp': image_path / 'fitnahtemp_legend.png',
 }
 
+
+# function to load main dataset
+@st.cache_data()
+def load_data(basepath=data_path / 'app_data.nc'):
+    with xr.open_dataset(basepath) as ds:
+        loaded = ds.load()
+    return ds
+
+
+# set page configuration
 st.set_page_config(
     page_title='Hot Biel Summer',
     page_icon=str(favicon),
@@ -40,39 +44,54 @@ st.set_page_config(
 )
 
 def main():
-
-
     data = load_data()
-    activities = ['Home', 'Fitnah Maps', 'Time Series', 'Groups', 'BAMBI Model']
-    choice = st.sidebar.selectbox('Select Activity', activities)
+    activities = ['Home', 'Fitnah Maps', 'Station Maps', 'Time Series', 'Groups', 'BAMBI Model', 'References & Acknowledgements']
+    with st.container(border=True):
+        st.markdown('##### Choose Activity')
+        choice = st.selectbox('choose activity', activities)
     if choice == 'Home':
         st.markdown("""
         # Hot Biel Summer
+        
+        Data visualization tool for the 2023 Urban Heat Island measurement campaign in Biel.
 
-        Explore the 2023 urban temperature data from Biel.
-
-        You can view some summary results of the data from the **2023 measurement campaign** below. Select the menu on the left to:
-
-        - **View Geospatial Data Layers**: Explore various geographical layers and overlays.
-        - **Explore Station Data as Time Series**: Analyze temperature trends over time from individual stations.
-        - **Build Your Own Model**: Use the **Bayesian Model Building Interface (BAMBI)** to create your own predictions based on the data.
+        **Select from the menu above to get started**
+        - Fitnah Maps - Map of the UHI model of Biel provided by the canton
+        - Station Maps - Map of the results of the measurement campaign
+        - Time Series - Plot timeseries of the different data variables
+        - Groups - Plot timeseries of predefined station groups
+        - Bambi Model - Make a model using the BAMBI interface and the underlying geospatial data (not yet implemented)
+        - References - Packages used, inspiration
         """)
-        stationmap.select_plotting(data)
+
     elif choice == 'BAMBI Model':
         st.write('coming soon')
     elif choice == 'About':
         about.display_information()
+    elif choice == 'Station Maps':
+        stationmap.select_plotting(data.drop_sel(sensor=[240, 231]))
     elif choice == 'Time Series':
         dataviz.select_plots(data)
     elif choice == 'Groups':
         dataviz.plot_overall_group(data)
     elif choice == 'Fitnah Maps':
-        basemap = fitnahmaps.MapDisplay.load_base_map(fitnahmaps.MapDisplay.load_points())
-        fitnahmaps.select_overlay()
-        meta = st.session_state.get('overlay')
-        if meta:
-            newmap = fitnahmaps.MapDisplay.overlay_image(basemap)
-            stf.st_folium(newmap, height=st.session_state.overlay['height'], width=st.session_state.overlay['width'])
-            if meta['legend']:
-                st.image(str(meta['legend']), caption="Legend", width=300)
+        st.markdown('#### View Fitnah Maps')
+        fitnahmaps.main()
+    elif choice == 'References & Acknowledgements':
+        st.markdown("""
+        ##### Packages used
+        
+        - QGIS to create the FITNAH image overlays
+        - xarray for primary data manipulation and storage
+        - pandas for secondary data manipulation
+        - Folium & Streamlit-Folium to present the FITNAH maps (as they are PNG images)
+        - pydeck to map the empirical data
+        - Holoviews / bokeh to make the interactive time series plots
+        - streamlit of course to write this app
+        
+        ##### Support and Help
+        - Ville de Bienne for making the project run smoothly re authorizations and support.
+        - Geographisches Institut UNIBE for everything: the sensors, the idea, sparking my interest in the UHI to begin with.
+        - hammerdirt for advice, support, feedback when no one else takes a look
+        """)
 main()

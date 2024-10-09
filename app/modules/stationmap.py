@@ -3,8 +3,6 @@ import pydeck as pdk
 import matplotlib.cm as cm
 import matplotlib.colors as colors
 
-
-
 def prep_data(dataset, selection):
     if selection == 'Max Temp':
         dataframe = dataset.max_temp.max(dim='time').to_dataframe()
@@ -19,8 +17,8 @@ def prep_data(dataset, selection):
         dataframe = dataset['uhi_4'].mean(dim='time').to_dataframe()
         colname = 'uhi_4'
     if selection == 'FITNAH Prediction':
-        dataframe = dataset['fitnah_temp'].sel(buffer=50).drop_vars('buffer').to_dataframe()
-        colname = 'fitnah_temp'
+        dataframe = dataset['fitnahtemp'].sel(buffer=50).drop_vars('buffer').to_dataframe()
+        colname = 'fitnahtemp'
     dataframe['X'] = dataset['X'].values
     dataframe['Y'] = dataset['Y'].values
     norm = colors.Normalize(vmin=dataframe[colname].min(), vmax=dataframe[colname].max())
@@ -36,6 +34,7 @@ def prep_data(dataset, selection):
     return dataframe, colname
 
 def select_plotting(data):
+    st.subheader('View empirical results by station')
     st.write('View results by station for key indicators of urban heat in 2023 in Biel. Select the data type below.')
     datavars = ['4AM UHI', 'Max Temp', 'Min Temp', 'City Index', 'FITNAH Prediction']
     var_selection = st.selectbox('Select variables', datavars)
@@ -49,7 +48,7 @@ def plot_points(data, selection):
         data=df,
         get_position=['X', 'Y'],
         get_color='color',  # Now this refers to the calculated RGBA values
-        get_radius=100,
+        get_radius=125,
         pickable=True,
         extruded=True,
     )
