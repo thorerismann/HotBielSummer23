@@ -1,10 +1,5 @@
-from pathlib import Path
-import xarray as xr
-import pandas as pd
-import numpy as np
 from matplotlib import pyplot as plt
 import seaborn as sns
-from copy import deepcopy
 
 
 def uhi_lineplot(data, highlight_stations, period, directories, sensor_labels, title):

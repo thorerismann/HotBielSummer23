@@ -1,13 +1,9 @@
 import rasterio
-from rasterio.plot import show
 import geopandas as gpd
-import matplotlib.pyplot as plt
-import os
 from rasterio.mask import mask
 from pathlib import Path
 import pandas as pd
 import numpy as np
-from rasterio.warp import calculate_default_transform, reproject, Resampling
 
 directories = {
     'plot_directory': Path('/home/tge/master/urbanheat/charts'),

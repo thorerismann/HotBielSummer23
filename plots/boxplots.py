@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-import pandas as pd
 
 
 def plot_hourly_boxplots(data, variable, time_name, time, title, y_label, fontsize, save_dir):

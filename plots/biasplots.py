@@ -1,10 +1,6 @@
-from pathlib import Path
 import xarray as xr
-import pandas as pd
-import numpy as np
 from matplotlib import pyplot as plt
 import seaborn as sns
-from copy import deepcopy
 
 
 def calculate_bias(meteodata, tdata, directories):

@@ -1,10 +1,4 @@
-from pathlib import Path
-import xarray as xr
-import pandas as pd
-import numpy as np
 from matplotlib import pyplot as plt
-import seaborn as sns
-from copy import deepcopy
 
 def overlay_max_mean_min_temperature(mdata, sdata, time_period, title, directories):
     # Define color mapping for each station
