@@ -6,12 +6,12 @@ textColor="#000000"
 font = "sans serif"
 
 [server]
-headless = true
+headless = false
 
 [browser]
 gatherUsageStats = false
 
 [layout]
-wideMode = false
+wideMode = true
 
 
