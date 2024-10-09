@@ -40,46 +40,55 @@ def plot_overall_group(station):
 
 
 def select_plots(data):
-    with st.container(border=True):
-        st.subheader('Time series visualization')
-        st.info('Data available in daily format due to space constraints in the app. See the github repository for 10-minute and hourly data')
-        with st.form('plot_data'):
-            st.subheader('Plot Station Data')
-            st.info('Select a data type and any number of stations to plot.')
-            st.info('ci_4 = City Index at 4 AM, uhi_4 = UHI at 4 AM, ')
-            dtype  = st.selectbox('select data type',['uhi_4', 'ci_4', 'tropical_nights', 'max_temp', 'min_temp', 'uhi_max', 'ci_max'])
-            stations = list(range(201, 241))
-            cols = st.columns(4)
+    st.subheader('Time series visualization')
+    st.info('Data available in daily format due to space constraints in the app. See the github repository for 10-minute and hourly data')
+    with st.form('plot_data'):
+        st.subheader('Plot Station Data')
+        st.info('Select a data type and any number of stations to plot.')
+        st.info('ci_4 = City Index at 4 AM, uhi_4 = UHI at 4 AM, ')
+        dtype  = st.selectbox('select data type',['uhi_4', 'ci_4', 'tropical_nights', 'max_temp', 'min_temp', 'uhi_max', 'ci_max'])
+        stations = list(range(201, 241))
+        with st.expander('Select stations', expanded=False):
+            cols = st.columns(2)
             for i, station in enumerate(stations):
-                col = cols[i % 4]
+                col = cols[i % 2]
                 with col:
                     st.checkbox(f'Station {station}', key=f'station_{station}', value=False)
-            start = st.date_input('Select Start', value = datetime.strptime('2023-05-15', '%Y-%m-%d'), min_value=datetime.strptime('2023-05-15', '%Y-%m-%d'), max_value=datetime.strptime('2023-09-15', '%Y-%m-%d'))
-            end = st.date_input('Select End', value = datetime.strptime('2023-09-15', '%Y-%m-%d'), min_value=datetime.strptime('2023-05-15', '%Y-%m-%d'), max_value=datetime.strptime('2023-09-15', '%Y-%m-%d'))
-            plot_stations = st.form_submit_button('Plot Stations')
-        if plot_stations:
-            selection = {k:v for k,v in st.session_state.items() if 'station_' in k}
-            selected_stations = [k for k,v in selection.items() if v]
-            if len(selected_stations) < 1:
-                st.warning('Select at least one station to plot data')
-                return
-            if end <= start:
-                st.warning('End date must be greater than start date')
-                return
-                # Select data for the selected stations and data type
-            stations = [int(x[-3:]) for x in selected_stations]
-            st.session_state['plot_stations_data'] = {
-                'stations': stations,
-                'dtype': dtype,
-                'start': pd.to_datetime(start),
-                'end': pd.to_datetime(end),
-            }
-        meta = st.session_state.get('plot_stations_data')
+        start = st.date_input('Select Start', value = datetime.strptime('2023-05-15', '%Y-%m-%d'), min_value=datetime.strptime('2023-05-15', '%Y-%m-%d'), max_value=datetime.strptime('2023-09-15', '%Y-%m-%d'))
+        end = st.date_input('Select End', value = datetime.strptime('2023-09-15', '%Y-%m-%d'), min_value=datetime.strptime('2023-05-15', '%Y-%m-%d'), max_value=datetime.strptime('2023-09-15', '%Y-%m-%d'))
+        plot_stations = st.form_submit_button('Plot Stations')
+    if plot_stations:
+        selection = {k:v for k,v in st.session_state.items() if 'station_' in k}
+        selected_stations = [k for k,v in selection.items() if v]
+        if len(selected_stations) < 1:
+            st.warning('Select at least one station to plot data')
+            return
+        if end <= start:
+            st.warning('End date must be greater than start date')
+            return
+            # Select data for the selected stations and data type
+        stations = [int(x[-3:]) for x in selected_stations]
+        st.session_state['plot_stations_data'] = {
+            'stations': stations,
+            'dtype': dtype,
+            'start': pd.to_datetime(start),
+            'end': pd.to_datetime(end),
+        }
+    meta = st.session_state.get('plot_stations_data')
 
-        if meta:
-            selected_data = data.sel(sensor=meta['stations'], time=slice(meta['start'], meta['end']))[meta['dtype']].to_dataframe().reset_index()
+    if meta:
+        selected_data = data.sel(sensor=meta['stations'], time=slice(meta['start'], meta['end']))[meta['dtype']].to_dataframe().reset_index()
 
-            pivoted_data = selected_data.pivot(index='time', columns='sensor', values=meta['dtype'])
+        pivoted_data = selected_data.pivot(index='time', columns='sensor', values=meta['dtype'])
 
-            # Plot using Streamlit's native line chart
-            st.line_chart(pivoted_data)
+        # Plot using Streamlit's native line chart
+        st.line_chart(pivoted_data)
+
+    else:
+        st.write('Displaying default: uhi at 4 am between june 15th and aug 15th')
+        selected_data = data.sel(sensor=[201, 202, 203], time=slice('2023-06-15', '2023-08-15'))['uhi_4'].to_dataframe().reset_index()
+
+        pivoted_data = selected_data.pivot(index='time', columns='sensor', values='uhi_4')
+
+        # Plot using Streamlit's native line chart
+        st.line_chart(pivoted_data)

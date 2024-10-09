@@ -39,7 +39,7 @@ def load_data(basepath=data_path / 'app_data.nc'):
 st.set_page_config(
     page_title='Hot Biel Summer',
     page_icon=str(favicon),
-    layout='centered',
+    layout='wide',
     initial_sidebar_state='auto'
 )
 
