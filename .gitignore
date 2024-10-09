@@ -1,3 +1,53 @@
 # make a git ignore file that will ignore all the files in the data folder
 # any anything to do with streamlit, jupyter, mapmaking, pycharm, etc
 # i want to set up my app folder for deployment
+
+# General
+*.log
+*.dat
+*.out
+*.pid
+*.seed
+
+# Data files
+data/*
+
+# old code
+code_archive/*
+
+# charts and images
+charts/*
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_meta
+*.ipynb
+
+# Mapmaking tools might create these types of files
+*.shp
+*.shx
+*.prj
+*.dbf
+
+# PyCharm
+.idea/
+*.iml
+
+# Virtual environments
+venv/
+env/
+*.pyc
+
+# Operating System generated files
+.DS_Store
+Thumbs.db
+
+# Deployment files
+.Dockerignore
+docker-compose.yml
+
+# Node modules for any front-end applications
+node_modules/
+
+# Environment secrets
+.env

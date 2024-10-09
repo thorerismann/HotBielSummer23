@@ -54,13 +54,14 @@ def main():
         # Hot Biel Summer
         
         Data visualization tool for the 2023 Urban Heat Island measurement campaign in Biel.
+        
+        Contact via thor @ hammerdirt . ch or better yet make a comment on the repository (button above).
 
         **Select from the menu above to get started**
         - Fitnah Maps - Map of the UHI model of Biel provided by the canton
         - Station Maps - Map of the results of the measurement campaign
         - Time Series - Plot timeseries of the different data variables
         - Groups - Plot timeseries of predefined station groups
-        - Bambi Model - Make a model using the BAMBI interface and the underlying geospatial data (not yet implemented)
         - References - Packages used, inspiration
         """)
 
@@ -81,13 +82,11 @@ def main():
         st.markdown("""
         ##### Packages used
         
-        - QGIS to create the FITNAH image overlays
-        - xarray for primary data manipulation and storage
-        - pandas for secondary data manipulation
-        - Folium & Streamlit-Folium to present the FITNAH maps (as they are PNG images)
-        - pydeck to map the empirical data
-        - Holoviews / bokeh to make the interactive time series plots
-        - streamlit of course to write this app
+        - QGIS, Folium and Streamlit-Folium to create the FITNAH maps
+        - xarray / pandas for data manipulation
+        - pydeck and geopandas to create the station maps
+        - streamlit linecharts to display the station data
+        - streamlit api to write this app, of course
         
         ##### Support and Help
         - Ville de Bienne for making the project run smoothly re authorizations and support.
